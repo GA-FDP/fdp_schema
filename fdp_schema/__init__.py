@@ -25,6 +25,7 @@ from .models import (
     Locator,
     Tokamak,
 )
+from .loader import load_tokamak
 
 __all__ = [
     "__version__",
@@ -34,4 +35,5 @@ __all__ = [
     "SqlLocator",
     "Locator",
     "Tokamak",
+    "load_tokamak",
 ]
