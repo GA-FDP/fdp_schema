@@ -27,6 +27,16 @@ from .models import (
 )
 from .loader import load_tokamak
 
+
+def tokamak_json_schema() -> dict:
+    """Return the JSON Schema (Draft 2020-12) for a Tokamak document.
+
+    Useful for non-Python consumers (Julia, JS, etc.) to validate catalog
+    files without importing pydantic.
+    """
+    return Tokamak.model_json_schema()
+
+
 __all__ = [
     "__version__",
     "AuthHint",
@@ -36,4 +46,5 @@ __all__ = [
     "Locator",
     "Tokamak",
     "load_tokamak",
+    "tokamak_json_schema",
 ]
