@@ -9,6 +9,7 @@ pydantic = ">=2"
 pyyaml = "*"
 pytest = "*"
 versioneer = "*"
+pip = ">=26.1.2,<27"
 
 [pypi-dependencies]
 fdp_schema = { path = ".", editable = true }
