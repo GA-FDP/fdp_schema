@@ -87,3 +87,17 @@ class TestLoadTokamak:
             load_tokamak(p)
         # The error message should make it possible to identify the source file.
         assert "bad.yaml" in str(exc.value) or "bad.yaml" in repr(exc.value)
+
+
+class TestD3DFixture:
+    def test_d3d_fixture_loads(self):
+        from pathlib import Path
+        from fdp_schema import load_tokamak
+        fixture = Path(__file__).parent / "fixtures" / "d3d.yaml"
+        t = load_tokamak(fixture)
+        assert t.name == "d3d"
+        assert len(t.locators) == 3
+        kinds = {l.kind for l in t.locators}
+        assert kinds == {"mds_tree", "ptdata_indexed", "sql"}
+        assert t.extra_env["D3DATA"] == "yes"
+        assert t.extra_env["SYS_D3_DELIM"] == ";"
