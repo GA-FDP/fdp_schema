@@ -55,3 +55,17 @@ Locator = Annotated[
     Union[MdsTreeLocator, PtDataIndexedLocator, SqlLocator],
     Field(discriminator="kind"),
 ]
+
+
+class Tokamak(BaseModel):
+    """One tokamak's data-locator catalog. Schema-versioned for forward
+    compatibility — v2 (when it exists) will live as a separate class and
+    the loader will dispatch on the declared version."""
+
+    schema_version: Literal[1] = 1
+    name: str
+    description: str = ""
+    pelican_root: str | None = None
+    origin_server: str | None = None
+    locators: list[Locator] = []
+    extra_env: dict[str, str] = {}

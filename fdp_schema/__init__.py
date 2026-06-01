@@ -17,7 +17,21 @@ from . import _version
 
 __version__ = _version.get_versions()["version"]
 
+from .models import (
+    AuthHint,
+    MdsTreeLocator,
+    PtDataIndexedLocator,
+    SqlLocator,
+    Locator,
+    Tokamak,
+)
+
 __all__ = [
     "__version__",
+    "AuthHint",
+    "MdsTreeLocator",
+    "PtDataIndexedLocator",
+    "SqlLocator",
+    "Locator",
+    "Tokamak",
 ]
-# Other re-exports added by subsequent tasks.
