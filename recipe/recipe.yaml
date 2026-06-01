@@ -1,0 +1,55 @@
+# Copyright 2024 General Atomics
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+
+context:
+  version: ${{ env.get("PKG_VERSION") }}
+
+package:
+  name: fdp-schema
+  version: ${{ version }}
+
+source:
+  path: ..
+
+build:
+  noarch: python
+  script:
+    - ${{ PYTHON }} -m pip install . --no-deps --no-build-isolation --ignore-installed -vv
+
+requirements:
+  host:
+    - python
+    - pip
+    - setuptools
+    - versioneer
+  run:
+    - python >=3.11
+    - pydantic >=2
+    - pyyaml
+
+tests:
+  - python:
+      imports:
+        - fdp_schema
+  - script:
+      content:
+        - cd tests && pytest -q
+    requirements:
+      run:
+        - pytest
+    files:
+      source:
+        - tests/
+
+about:
+  homepage: https://github.com/GA-FDP/fdp_schema
+  license: Apache-2.0
+  license_file: LICENSE
+  summary: Package-neutral schema for tokamak data locator catalogs
+  repository: https://github.com/GA-FDP/fdp_schema
+
+extra:
+  recipe-maintainers:
+    - sammuli
