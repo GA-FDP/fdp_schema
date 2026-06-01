@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=61", "wheel", "versioneer[toml]==0.29"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fdp-schema"
+description = "Package-neutral schema for tokamak data locator catalogs"
+authors = [{name = "General Atomics"}]
+license = {text = "Apache-2.0"}
+readme = "README.md"
+requires-python = ">=3.11"
+dynamic = ["version"]
+dependencies = [
+    "pydantic>=2",
+    "pyyaml",
+]
+
+[project.optional-dependencies]
+test = ["pytest"]
+
+[tool.setuptools.packages.find]
+include = ["fdp_schema*"]
+
+[tool.setuptools.package-data]
+"fdp_schema" = ["py.typed"]
+
+[tool.versioneer]
+VCS = "git"
+style = "pep440"
+versionfile_source = "fdp_schema/_version.py"
+versionfile_build = "fdp_schema/_version.py"
+tag_prefix = "release-"
+parentdir_prefix = "fdp_schema-"
