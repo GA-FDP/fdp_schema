@@ -196,3 +196,17 @@ class TestTokamak:
         from fdp_schema.models import Tokamak
         with pytest.raises(ValidationError):
             Tokamak(name="x", extra_env={"K": 42})
+
+    def test_default_llm_preset_field(self):
+        from fdp_schema.models import Tokamak
+        # Default is None.
+        t = Tokamak(name="x")
+        assert t.default_llm_preset is None
+        # Accepts a string.
+        t = Tokamak(name="x", default_llm_preset="amsc")
+        assert t.default_llm_preset == "amsc"
+        # YAML-style round-trip.
+        t2 = Tokamak.model_validate(
+            {"name": "x", "default_llm_preset": "amsc"}
+        )
+        assert t2.default_llm_preset == "amsc"

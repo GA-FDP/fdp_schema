@@ -69,3 +69,4 @@ class Tokamak(BaseModel):
     origin_server: str | None = None
     locators: list[Locator] = []
     extra_env: dict[str, str] = {}
+    default_llm_preset: str | None = None
