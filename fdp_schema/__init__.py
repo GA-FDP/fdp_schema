@@ -22,6 +22,8 @@ from .models import (
     MdsTreeLocator,
     PtDataIndexedLocator,
     SqlLocator,
+    ZarrStoreLocator,
+    HttpCatalogLocator,
     Locator,
     Tokamak,
 )
@@ -43,6 +45,8 @@ __all__ = [
     "MdsTreeLocator",
     "PtDataIndexedLocator",
     "SqlLocator",
+    "ZarrStoreLocator",
+    "HttpCatalogLocator",
     "Locator",
     "Tokamak",
     "load_tokamak",

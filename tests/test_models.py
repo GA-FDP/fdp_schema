@@ -279,3 +279,11 @@ class TestHttpCatalogLocator:
         c = HttpCatalogLocator(name="m", base_url="https://h",
                                shots_path="p")
         assert c.signals_path is None
+
+
+class TestPackageExports:
+    def test_new_locators_exported(self):
+        import fdp_schema
+        assert hasattr(fdp_schema, "ZarrStoreLocator")
+        assert hasattr(fdp_schema, "HttpCatalogLocator")
+        from fdp_schema import ZarrStoreLocator, HttpCatalogLocator  # noqa
