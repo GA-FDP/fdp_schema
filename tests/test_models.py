@@ -142,6 +142,26 @@ class TestLocatorDispatch:
         with pytest.raises(ValidationError):
             adapter.validate_python({"kind": "kafka", "name": "x"})
 
+    def test_dispatch_zarr_store(self):
+        from pydantic import TypeAdapter
+        from fdp_schema.models import Locator, ZarrStoreLocator
+        adapter = TypeAdapter(Locator)
+        loc = adapter.validate_python(
+            {"kind": "zarr_store", "name": "main", "protocol": "s3",
+             "base_url": "s3://b/p"}
+        )
+        assert isinstance(loc, ZarrStoreLocator)
+
+    def test_dispatch_http_catalog(self):
+        from pydantic import TypeAdapter
+        from fdp_schema.models import Locator, HttpCatalogLocator
+        adapter = TypeAdapter(Locator)
+        loc = adapter.validate_python(
+            {"kind": "http_catalog", "name": "m",
+             "base_url": "https://h", "shots_path": "p"}
+        )
+        assert isinstance(loc, HttpCatalogLocator)
+
 
 class TestTokamak:
     def test_minimal(self):
@@ -210,3 +230,60 @@ class TestTokamak:
             {"name": "x", "default_llm_preset": "amsc"}
         )
         assert t2.default_llm_preset == "amsc"
+
+
+class TestZarrStoreLocator:
+    def test_minimal(self):
+        from fdp_schema.models import ZarrStoreLocator
+        z = ZarrStoreLocator(
+            name="main", protocol="s3",
+            base_url="s3://mast/level2/shots",
+            endpoint="https://s3.echo.stfc.ac.uk",
+        )
+        assert z.kind == "zarr_store"
+        assert z.protocol == "s3"
+        assert z.base_url == "s3://mast/level2/shots"
+        assert z.file_name_format == "{shot}.zarr"   # default
+        assert z.endpoint == "https://s3.echo.stfc.ac.uk"
+        assert z.auth is None
+
+    def test_unknown_protocol_rejected(self):
+        from fdp_schema.models import ZarrStoreLocator
+        with pytest.raises(ValidationError):
+            ZarrStoreLocator(name="main", protocol="ftp",
+                             base_url="x://y")
+
+    def test_auth_none(self):
+        from fdp_schema.models import ZarrStoreLocator, AuthHint
+        z = ZarrStoreLocator(name="m", protocol="https",
+                             base_url="https://h/p",
+                             auth=AuthHint(kind="none"))
+        assert z.auth.kind == "none"
+
+
+class TestHttpCatalogLocator:
+    def test_minimal(self):
+        from fdp_schema.models import HttpCatalogLocator
+        c = HttpCatalogLocator(
+            name="metadata", base_url="https://mastapp.site",
+            shots_path="parquet/level2/shots",
+            signals_path="parquet/level2/signals",
+        )
+        assert c.kind == "http_catalog"
+        assert c.base_url == "https://mastapp.site"
+        assert c.shots_path == "parquet/level2/shots"
+        assert c.signals_path == "parquet/level2/signals"
+
+    def test_signals_path_optional(self):
+        from fdp_schema.models import HttpCatalogLocator
+        c = HttpCatalogLocator(name="m", base_url="https://h",
+                               shots_path="p")
+        assert c.signals_path is None
+
+
+class TestPackageExports:
+    def test_new_locators_exported(self):
+        import fdp_schema
+        assert hasattr(fdp_schema, "ZarrStoreLocator")
+        assert hasattr(fdp_schema, "HttpCatalogLocator")
+        from fdp_schema import ZarrStoreLocator, HttpCatalogLocator  # noqa

@@ -51,8 +51,41 @@ class SqlLocator(BaseModel):
     auth: AuthHint | None = None
 
 
+class ZarrStoreLocator(BaseModel):
+    """A Zarr object store with one store per shot, addressed by a base
+    URL plus a per-shot filename template. `protocol` selects the fsspec
+    backend; `endpoint` supplies the object-store host for non-AWS S3
+    (e.g. STFC Echo)."""
+
+    kind: Literal["zarr_store"] = "zarr_store"
+    name: str
+    protocol: Literal["https", "s3", "file"]
+    base_url: str
+    file_name_format: str = "{shot}.zarr"
+    endpoint: str | None = None
+    auth: AuthHint | None = None
+
+
+class HttpCatalogLocator(BaseModel):
+    """An HTTP metadata catalog exposing shot/signal tables (e.g. parquet
+    endpoints). Paths are templated relative to `base_url`."""
+
+    kind: Literal["http_catalog"] = "http_catalog"
+    name: str
+    base_url: str
+    shots_path: str
+    signals_path: str | None = None
+    auth: AuthHint | None = None
+
+
 Locator = Annotated[
-    Union[MdsTreeLocator, PtDataIndexedLocator, SqlLocator],
+    Union[
+        MdsTreeLocator,
+        PtDataIndexedLocator,
+        SqlLocator,
+        ZarrStoreLocator,
+        HttpCatalogLocator,
+    ],
     Field(discriminator="kind"),
 ]
 

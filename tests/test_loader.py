@@ -101,3 +101,22 @@ class TestD3DFixture:
         assert kinds == {"mds_tree", "ptdata_indexed", "sql"}
         assert t.extra_env["D3DATA"] == "yes"
         assert t.extra_env["SYS_D3_DELIM"] == ";"
+
+
+class TestMastFixture:
+    def test_mast_fixture_loads(self):
+        from pathlib import Path
+        from fdp_schema import (
+            load_tokamak, ZarrStoreLocator, HttpCatalogLocator,
+        )
+        fixture = Path(__file__).parent / "fixtures" / "mast.yaml"
+        t = load_tokamak(fixture)
+        assert t.name == "mast"
+        assert len(t.locators) == 2
+        kinds = {l.kind for l in t.locators}
+        assert kinds == {"zarr_store", "http_catalog"}
+        z = next(l for l in t.locators if isinstance(l, ZarrStoreLocator))
+        assert z.protocol == "s3"
+        assert z.endpoint == "https://s3.echo.stfc.ac.uk"
+        c = next(l for l in t.locators if isinstance(l, HttpCatalogLocator))
+        assert c.shots_path == "parquet/level2/shots"
