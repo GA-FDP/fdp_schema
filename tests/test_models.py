@@ -79,6 +79,18 @@ class TestPtDataIndexedLocator:
         assert p.kind == "ptdata_indexed"
         assert p.index_dir == "pelican://host/index"
 
+    def test_ptdata_locator_index_pattern_optional_and_settable(self):
+        from fdp_schema import PtDataIndexedLocator
+        # Defaults to None (backward compatible: pinned index_dir).
+        p = PtDataIndexedLocator(name="main", transport="pelican",
+                                 index_dir="pelican://host/index")
+        assert p.index_pattern is None
+        # Can be set to a glob.
+        p2 = PtDataIndexedLocator(name="main", transport="pelican",
+                                  index_dir="pelican://host/index",
+                                  index_pattern="json_indexes_*")
+        assert p2.index_pattern == "json_indexes_*"
+
 
 class TestSqlLocator:
     def test_mssql_full(self):
