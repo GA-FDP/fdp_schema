@@ -35,6 +35,11 @@ class PtDataIndexedLocator(BaseModel):
     name: str
     transport: Literal["pelican", "xrootd", "local"]
     index_dir: str
+    # Optional glob (e.g. "json_indexes_*"). When set, index_dir is treated
+    # as a PARENT and the latest matching subdir is selected at read time by
+    # the consumers (ptdata JsonIndexPlugin / PtDataResolver). When None,
+    # index_dir is used verbatim (a pinned, exact directory).
+    index_pattern: str | None = None
     auth: AuthHint | None = None
 
 
