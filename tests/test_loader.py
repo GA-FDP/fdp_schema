@@ -96,9 +96,12 @@ class TestD3DFixture:
         fixture = Path(__file__).parent / "fixtures" / "d3d.yaml"
         t = load_tokamak(fixture)
         assert t.name == "d3d"
-        assert len(t.locators) == 3
+        assert len(t.locators) == 4
         kinds = {l.kind for l in t.locators}
-        assert kinds == {"mds_tree", "ptdata_indexed", "sql"}
+        assert kinds == {"mds_tree", "ptdata_indexed", "sql", "sql_snapshot"}
+        snap = next(l for l in t.locators if l.kind == "sql_snapshot")
+        live = next(l for l in t.locators if l.kind == "sql")
+        assert snap.name == live.name == "d3drdb"
         assert t.extra_env["D3DATA"] == "yes"
         assert t.extra_env["SYS_D3_DELIM"] == ";"
 
