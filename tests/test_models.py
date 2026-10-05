@@ -299,3 +299,44 @@ class TestPackageExports:
         assert hasattr(fdp_schema, "ZarrStoreLocator")
         assert hasattr(fdp_schema, "HttpCatalogLocator")
         from fdp_schema import ZarrStoreLocator, HttpCatalogLocator  # noqa
+
+
+class TestSqlSnapshotLocator:
+    def test_full(self):
+        from fdp_schema.models import SqlSnapshotLocator, AuthHint
+        s = SqlSnapshotLocator(
+            name="d3drdb",
+            base_url="pelican://osg-htc.org:443/fdp-d3d/metadata/d3drdb",
+            id_pattern="d3drdb_*",
+            auth=AuthHint(kind="bearer_token", env="BEARER_TOKEN"),
+        )
+        assert s.kind == "sql_snapshot"
+        assert s.base_url.startswith("pelican://")
+        assert s.id_pattern == "d3drdb_*"
+        assert s.auth.env == "BEARER_TOKEN"
+
+    def test_id_pattern_is_required(self):
+        from fdp_schema.models import SqlSnapshotLocator
+        with pytest.raises(ValidationError):
+            SqlSnapshotLocator(name="d3drdb", base_url="https://x/y")
+
+    def test_dispatches_through_the_locator_union(self):
+        from pydantic import TypeAdapter
+        from fdp_schema.models import Locator, SqlSnapshotLocator
+        loc = TypeAdapter(Locator).validate_python({
+            "kind": "sql_snapshot", "name": "d3drdb",
+            "base_url": "https://x/y", "id_pattern": "d3drdb_*",
+        })
+        assert isinstance(loc, SqlSnapshotLocator)
+
+    def test_same_name_as_a_sql_locator_is_allowed(self):
+        # The live database and its snapshots share a name on purpose:
+        # that pairing is how a client finds the live counterpart.
+        from fdp_schema.models import Tokamak
+        t = Tokamak(name="d3d", locators=[
+            {"kind": "sql", "name": "d3drdb", "driver": "mssql",
+             "host": "h", "database": "d"},
+            {"kind": "sql_snapshot", "name": "d3drdb",
+             "base_url": "https://x/y", "id_pattern": "d3drdb_*"},
+        ])
+        assert [l.kind for l in t.locators] == ["sql", "sql_snapshot"]

@@ -27,4 +27,5 @@ class TestJsonSchema:
         assert "MdsTreeLocator" in names
         assert "PtDataIndexedLocator" in names
         assert "SqlLocator" in names
+        assert "SqlSnapshotLocator" in names
         assert "AuthHint" in names
