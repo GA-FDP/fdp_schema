@@ -56,6 +56,21 @@ class SqlLocator(BaseModel):
     auth: AuthHint | None = None
 
 
+class SqlSnapshotLocator(BaseModel):
+    """Published, immutable snapshots of a SQL database: one directory per
+    snapshot under `base_url`, each holding `manifest.json` and per-table
+    Parquet, read remotely by HTTP range request. `id_pattern` is a glob
+    that picks snapshot directories out of a listing of `base_url`, so
+    anything else beside them is ignored. Collation and other per-snapshot
+    properties live in the manifest, not here."""
+
+    kind: Literal["sql_snapshot"] = "sql_snapshot"
+    name: str
+    base_url: str
+    id_pattern: str
+    auth: AuthHint | None = None
+
+
 class ZarrStoreLocator(BaseModel):
     """A Zarr object store with one store per shot, addressed by a base
     URL plus a per-shot filename template. `protocol` selects the fsspec
@@ -88,6 +103,7 @@ Locator = Annotated[
         MdsTreeLocator,
         PtDataIndexedLocator,
         SqlLocator,
+        SqlSnapshotLocator,
         ZarrStoreLocator,
         HttpCatalogLocator,
     ],
